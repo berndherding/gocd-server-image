@@ -1,0 +1,10 @@
+#!/bin/bash
+
+if [ "$RUN_MODE" != "init" ] ; then
+
+  echo "$GITHUB_PEM_KEY" > /gocd/github.pem
+  chown go.go /gocd/github.pem
+  chmod 0400  /gocd/github.pem
+fi
+
+/sbin/my_init

@@ -1,0 +1,5 @@
+Host github.com
+  HostName github.com
+  IdentityFile /gocd/github.pem
+  UserKnownHostsFile /etc/ssh/github_known_hosts
+  User git
