@@ -25,7 +25,10 @@ function buildServer() {
   containerName=${imageName//:/-}
   imageName="$(getDockerHubUsername)/$imageName"
 
+  whoami
+  groups
   ls -la /var/run/docker.sock
+  tail -n 2 /etc/group
 
   docker build --no-cache -t "$imageName" "$(dirname "${BASH_SOURCE[0]}")"/docker | tee /tmp/server-build.out || return 1
 
