@@ -25,6 +25,8 @@ function buildServer() {
   containerName=${imageName//:/-}
   imageName="$(getDockerHubUsername)/$imageName"
 
+  ls -la /var/run/docker.sock
+
   docker build --no-cache -t "$imageName" "$(dirname "${BASH_SOURCE[0]}")"/docker | tee /tmp/server-build.out || return 1
 
   # why run at all? -> the gocd server extracts itself on first run
