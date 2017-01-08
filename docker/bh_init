@@ -7,4 +7,7 @@ if [ "$RUN_MODE" != "init" ] ; then
   chmod 0400  /gocd/github.pem
 fi
 
+# add go user to instance docker group
+echo "vmdocker:x:497:go" >> /etc/group
+
 /sbin/my_init
