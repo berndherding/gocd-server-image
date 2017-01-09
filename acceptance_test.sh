@@ -6,7 +6,7 @@
 GIT_HASH=${GO_REVISION_FNS_GOCD_SERVER_DOCKER:0:7}
 GIT_HASH=${GIT_HASH:-$(git rev-parse --short HEAD)}
 
-IMAGETAG=test-go-server:${GO_PIPELINE_COUNTER:-0}-$GIT_HASH
+IMAGETAG=go-server:${GO_PIPELINE_COUNTER:-0}-$GIT_HASH
 
 SHUNIT=$(which shunit)
 
@@ -22,6 +22,13 @@ function testBuildServer() {
 function testShipServer() {
   shipServer "$IMAGETAG"
   assertEquals "ship server failed" 0 $?
+}
+
+
+
+function testRunServer() {
+  runServer "$IMAGETAG"
+  assertEquals "run server failed" 0 $?
 }
 
 
