@@ -3,4 +3,5 @@
 # shellcheck source=server.inc
 . "$(dirname "${BASH_SOURCE[0]}")/server.inc"
 
-shipServer "${1:-$(getImageTag go-server)}"
+# shellcheck disable=SC2119
+ship "${1:-$(getImageTag)}"
