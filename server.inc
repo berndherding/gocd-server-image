@@ -19,7 +19,25 @@ shopt -s extglob
 
 
 
-function buildServer() {
+function getImageTag() {
+  local imageName=${1:-gocd-server}
+
+  imageTag=$imageName:${GO_PIPELINE_COUNTER:-0}
+
+  if [ "$imageTag" != "$imageName:0" ] ; then
+
+    gitHash=${GO_REVISION_GOCD_SERVER_IMAGE:0:7}
+    gitHash=${gitHash:-$(git rev-parse --short HEAD)}
+
+    imageTag="$imageTag-$gitHash"
+  fi
+
+  echo "$imageTag"
+}
+
+
+
+function build() {
   local imageName=$1
 
   containerName=${imageName//:/-}
@@ -48,7 +66,7 @@ function buildServer() {
 
 
 
-function shipServer() {
+function ship() {
   local imageName=$1
 
   docker login --username "$(getDockerHubUsername)" --password "$(getDockerHubPassword)"
@@ -64,10 +82,28 @@ function shipServer() {
 
 
 
-function destroyServer() {
+function run() {
   local imageName=$1
 
   containerName=${imageName//:/-}
 
-  docker rm -f "$containerName" || return 9
+  containerId=$(docker run --name "$containerName" -d \
+    -e GITHUB_PEM_KEY="$GITHUB_PEM_KEY" \
+    -e RUN_MODE=live \
+    "$(getDockerHubUsername)/$imageName"
+  ) || return 9
+
+  containerId=${containerId:0:12}
+
+  docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 600 || return 10
+}
+
+
+
+function destroy() {
+  local imageName=$1
+
+  containerName=${imageName//:/-}
+
+  docker rm -f "$containerName" || return 11
 }
