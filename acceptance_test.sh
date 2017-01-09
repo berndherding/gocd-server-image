@@ -25,14 +25,14 @@ function testShip() {
 
 
 function testRun() {
-  runServer "$IMAGETAG"
+  run "$IMAGETAG"
   assertEquals "run failed" 0 $?
 }
 
 
 
 function testDestroy() {
-  destroyServer "$IMAGETAG"
+  destroy "$IMAGETAG"
   assertEquals "destroy failed" 0 $?
 }
 
