@@ -8,6 +8,9 @@ shopt -s extglob
 # shellcheck source=/dev/null
 . "$(dirname "${BASH_SOURCE[0]}")/inc/commons.inc"
 
+# shellcheck source=/dev/null
+. "$(dirname "${BASH_SOURCE[0]}")/inc/keys.inc"
+
 ERROR_build_dockerBuild=1
 ERROR_build_dockerRun=2
 ERROR_build_dockerExec_movePlugins=3
