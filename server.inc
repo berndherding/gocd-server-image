@@ -10,13 +10,14 @@ shopt -s extglob
 
 ERROR_build_dockerBuild=1
 ERROR_build_dockerRun=2
-ERROR_build_dockerExec_waitForGoServer=3
-ERROR_build_dockerCommit=4
-ERROR_build_dockerRemove_container=5
-ERROR_destroy_dockerRemove_container=6
-ERROR_run_dockerExec_waitForGoServer=7
-ERROR_run_dockerRun=8
-ERROR_ship_dockerPush=9
+ERROR_build_dockerExec_movePlugins=3
+ERROR_build_dockerExec_waitForGoServer=4
+ERROR_build_dockerCommit=5
+ERROR_build_dockerRemove_container=6
+ERROR_destroy_dockerRemove_container=7
+ERROR_run_dockerExec_waitForGoServer=8
+ERROR_run_dockerRun=9
+ERROR_ship_dockerPush=10
 
 
 
