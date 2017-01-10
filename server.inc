@@ -8,8 +8,15 @@ shopt -s extglob
 # shellcheck source=/dev/null
 . "$(dirname "${BASH_SOURCE[0]}")/inc/commons.inc"
 
-# shellcheck source=/dev/null
-. "$(dirname "${BASH_SOURCE[0]}")/inc/keys.inc"
+ERROR_build_dockerBuild=1
+ERROR_build_dockerRun=2
+ERROR_build_dockerExec_waitForGoServer=3
+ERROR_build_dockerCommit=4
+ERROR_build_dockerRemove_container=5
+ERROR_destroy_dockerRemove_container=6
+ERROR_run_dockerExec_waitForGoServer=7
+ERROR_run_dockerRun=8
+ERROR_ship_dockerPush=9
 
 
 
@@ -43,23 +50,30 @@ function build() {
   containerName=${imageName//:/-}
   imageName="$(getDockerHubUsername)/$imageName"
 
-  docker build --no-cache -t "$imageName" "$(dirname "${BASH_SOURCE[0]}")"/docker | tee /tmp/server-build.out || return 1
+  docker build --no-cache -t "$imageName" "$(dirname "${BASH_SOURCE[0]}")"/docker | tee /tmp/server-build.out \
+  || return $ERROR_build_dockerBuild
 
   # why run at all? -> the gocd server extracts itself on first run
-  containerId=$(docker run --name "$containerName" -e RUN_MODE=init -d "$imageName") || return 2
+  containerId=$(docker run --name "$containerName" -e RUN_MODE=init -d "$imageName") \
+  || return $ERROR_build_dockerRun
 
   containerId=${containerId:0:12}
 
-  docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 600 || return 3
+  docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 300 \
+  || return $ERROR_build_dockerExec_waitForGoServer
 
   docker exec -t "$containerName" /bin/bash -c "
     mv /gocd-plugins/* /var/lib/go-server/plugins/external
     chown go.go /var/lib/go-server/plugins/external/*
-  " || return 4
+  " || return $ERROR_build_dockerExec_movePlugins
 
-  docker commit -m "go-server with github KnownHost and some plugins" "$containerId" "$imageName" || return 5
+  docker commit "$containerId" "$imageName" || return $ERROR_build_dockerCommit
 
-  docker rm -f "$containerName" || return 6
+  docker rm -f "$containerName" || return $ERROR_build_dockerRemove_container
+
+# CLEANUP:
+# docker ps -a  | grep Exited | awk '{print $1}' | xargs docker rm -f
+# docker images | grep none   | awk '{print $3}' | xargs docker rmi
 
   return 0
 }
@@ -71,11 +85,11 @@ function ship() {
 
   docker login --username "$(getDockerHubUsername)" --password "$(getDockerHubPassword)"
 
-  docker push "$(getDockerHubUsername)/$imageName" || return 7
+  docker push "$(getDockerHubUsername)/$imageName" || return $ERROR_ship_dockerPush
 
   echo "$(getDockerHubUsername)/$imageName" > "$(dirname "${BASH_SOURCE[0]}")"/target/gocdServerImageName
 
-  # docker rmi "$(docker images "$imageName" -q)"  || return 8
+  # docker rmi "$(docker images "$imageName" -q)"  || return $ERROR_ship_dockerRemoveImage
 
   docker logout
 }
@@ -91,11 +105,12 @@ function run() {
     -e GITHUB_PEM_KEY="$GITHUB_PEM_KEY" \
     -e RUN_MODE=live \
     "$(getDockerHubUsername)/$imageName"
-  ) || return 9
+  ) || return $ERROR_run_dockerRun
 
   containerId=${containerId:0:12}
 
-  docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 600 || return 10
+  docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 300 \
+  || return $ERROR_run_dockerExec_waitForGoServer
 }
 
 
@@ -105,5 +120,6 @@ function destroy() {
 
   containerName=${imageName//:/-}
 
-  docker rm -f "$containerName" || return 11
+  docker rm -f "$containerName" \
+  || return $ERROR_destroy_dockerRemove_container
 }
