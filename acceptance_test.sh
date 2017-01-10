@@ -45,5 +45,5 @@ function testDestroy() {
 
 
 
-# shellcheck source=/usr/local/bin/shunit
+# shellcheck source=/dev/null
 . "$SHUNIT"
