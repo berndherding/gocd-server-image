@@ -58,7 +58,7 @@ function build() {
   || return $ERROR_build_dockerBuild
 
   # why run at all? -> the gocd server extracts itself on first run
-  containerId=$(docker run --name "$containerName" -e RUN_MODE=init -d "$imageName") \
+  containerId=$(docker run --name "$containerName" -d "$imageName") \
   || return $ERROR_build_dockerRun
 
   containerId=${containerId:0:12}
@@ -75,7 +75,7 @@ function build() {
 
   docker rm -f "$containerName" || return $ERROR_build_dockerRemove_container
 
-# CLEANUP:
+# TODO CLEANUP:
 # docker ps -a  | grep Exited | awk '{print $1}' | xargs docker rm -f
 # docker images | grep none   | awk '{print $3}' | xargs docker rmi
 
@@ -106,8 +106,6 @@ function run() {
   containerName=${imageName//:/-}
 
   containerId=$(docker run --name "$containerName" -d \
-    -e GITHUB_PEM_KEY="$GITHUB_PEM_KEY" \
-    -e RUN_MODE=live \
     "$(getDockerHubUsername)/$imageName"
   ) || return $ERROR_run_dockerRun
 

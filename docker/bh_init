@@ -1,10 +1,20 @@
 #!/bin/bash
 
-if [ "$RUN_MODE" != "init" ] ; then
+if [ -z "$GITHUB_PRIVATE_KEY" ] && [ "$ENABLE_GITHUB_PRIVATE_REPO_SUPPORT" = "yes" ] ; then
 
-  echo "$GITHUB_PEM_KEY" > /gocd/github.pem
+  echo "$GITHUB_PRIVATE_KEY" > /gocd/github.pem
   chown go.go /gocd/github.pem
   chmod 0400  /gocd/github.pem
+
+  cat <<EOF
+#
+# IMPORTANT SECURITY NOTE:
+#
+# This image is containing your Github Private Key in /gocd/github.pem.
+#
+# DO NOT COMMIT AND PUSH THIS IMAGE TO A PUBLIC REPOSITORY!!!
+#
+EOF
 fi
 
 # add go user to instance docker group
