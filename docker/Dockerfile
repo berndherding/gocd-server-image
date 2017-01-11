@@ -3,7 +3,7 @@
 # make sure to have github grant access by uploading
 # the ssh public key before.
 
-FROM gocd/gocd-server:16.6.0
+FROM gocd/gocd-server:16.12.0
 
 COPY known_hosts /etc/ssh/github_known_hosts
 COPY ssh_config  /etc/ssh
