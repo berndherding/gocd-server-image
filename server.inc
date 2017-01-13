@@ -13,7 +13,7 @@ shopt -s extglob
 
 ERROR_build_dockerBuild=1
 ERROR_build_dockerRun=2
-#ERROR_build_dockerExec_movePlugins=3
+ERROR_build_dockerExec_linkPlugins=3
 ERROR_build_dockerExec_waitForGoServer=4
 ERROR_build_dockerCommit=5
 ERROR_build_dockerRemove_container=6
@@ -69,7 +69,7 @@ function build() {
   docker exec -t "$containerName" /bin/bash -c "
     rm -fr /var/lib/go-server/plugins/external
     ln -sf /plugins /var/lib/go-server/plugins/external
-  " || return $ERROR_build_dockerExec_movePlugins
+  " || return $ERROR_build_dockerExec_linkPlugins
 
   docker commit "$containerId" "$imageName" || return $ERROR_build_dockerCommit
 
