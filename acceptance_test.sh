@@ -47,3 +47,5 @@ function testDestroy() {
 
 # shellcheck source=/dev/null
 . "$SHUNIT"
+
+# TODO: tag as :accepted [ $? -eq 0 ] && docker tag $(getImageTag) && docker push

@@ -13,7 +13,7 @@ shopt -s extglob
 
 ERROR_build_dockerBuild=1
 ERROR_build_dockerRun=2
-ERROR_build_dockerExec_movePlugins=3
+#ERROR_build_dockerExec_movePlugins=3
 ERROR_build_dockerExec_waitForGoServer=4
 ERROR_build_dockerCommit=5
 ERROR_build_dockerRemove_container=6
@@ -66,10 +66,10 @@ function build() {
   docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 300 \
   || return $ERROR_build_dockerExec_waitForGoServer
 
-  docker exec -t "$containerName" /bin/bash -c "
-    mv /gocd-plugins/* /var/lib/go-server/plugins/external
-    chown go.go /var/lib/go-server/plugins/external/*
-  " || return $ERROR_build_dockerExec_movePlugins
+#  docker exec -t "$containerName" /bin/bash -c "
+#    mv /gocd-plugins/* /var/lib/go-server/plugins/external
+#    chown go.go /var/lib/go-server/plugins/external/*
+#  " || return $ERROR_build_dockerExec_movePlugins
 
   docker commit "$containerId" "$imageName" || return $ERROR_build_dockerCommit
 
@@ -78,6 +78,7 @@ function build() {
 # TODO CLEANUP:
 # docker ps -a  | grep Exited | awk '{print $1}' | xargs docker rm -f
 # docker images | grep none   | awk '{print $3}' | xargs docker rmi
+# docker volume ls -qf dangling=true | xargs -r docker volume rm
 
   return 0
 }
