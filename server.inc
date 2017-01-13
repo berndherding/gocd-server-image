@@ -66,10 +66,10 @@ function build() {
   docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 300 \
   || return $ERROR_build_dockerExec_waitForGoServer
 
-#  docker exec -t "$containerName" /bin/bash -c "
-#    mv /gocd-plugins/* /var/lib/go-server/plugins/external
-#    chown go.go /var/lib/go-server/plugins/external/*
-#  " || return $ERROR_build_dockerExec_movePlugins
+  docker exec -t "$containerName" /bin/bash -c "
+    rm -fr /var/lib/go-server/plugins/external
+    ln -sf /plugins /var/lib/go-server/plugins/external
+  " || return $ERROR_build_dockerExec_movePlugins
 
   docker commit "$containerId" "$imageName" || return $ERROR_build_dockerCommit
 
