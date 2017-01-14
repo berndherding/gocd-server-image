@@ -31,20 +31,10 @@ function testRun() {
 
 
 
-function testExternalPluginsFolderIsLink() {
-  local imageName=$1
-  containerName=${imageName//:/-}
-  docker exec "$containerName" /bin/bash -c "[ -L /var/lib/go-server/plugins/external ]"
-  assertEquals "/var/lib/go-server/plugins/external is not a symbolic link" 0 $?
-}
-
-
-
-function testExternalPluginsFolderIsNotEmpty() {
-  local imageName=$1
-  containerName=${imageName//:/-}
-  count="$(docker exec "$containerName" ls /var/lib/go-server/plugins/external | wc -l)"
-  assertNotEquals "/var/lib/go-server/plugins/external is empty" 0 "$count"
+function testPluginsFolderIsNotEmpty() {
+  containerName=${IMAGETAG//:/-}
+  count="$(docker exec "$containerName" ls /plugins | wc -l)"
+  assertNotEquals "/plugins is empty" 0 "$count"
 }
 
 
