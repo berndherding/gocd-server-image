@@ -20,4 +20,7 @@ fi
 # add go user to instance docker group
 echo "vmdocker:x:497:go" >> /etc/group
 
+# force generation of new keystores
+rm /etc/go/*store* 2> /dev/null
+
 /sbin/my_init
