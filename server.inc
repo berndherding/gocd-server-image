@@ -60,6 +60,8 @@ function build() {
   docker exec -t "$containerName" /bin/bash /usr/bin/wait_for_go_server.sh 300 \
   || return $ERROR_build_dockerExec_waitForGoServer
 
+  docker exec -t "$containerName" /bin/bash /bin/bash -c 'rm /etc/go/*store*'
+
   docker commit "$containerId" "$imageName" || return $ERROR_build_dockerCommit
 
   docker rm -f "$containerName" || return $ERROR_build_dockerRemove_container
