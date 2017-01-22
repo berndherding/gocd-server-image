@@ -2,25 +2,19 @@
 
 shopt -s extglob
 
-[ ! -e "$(dirname "${BASH_SOURCE[0]}")/inc"    ] && ln -s ../gocd-base-ami/inc    "$(dirname "${BASH_SOURCE[0]}")/inc"
-[ ! -e "$(dirname "${BASH_SOURCE[0]}")/target" ] && ln -s ../gocd-base-ami/target "$(dirname "${BASH_SOURCE[0]}")/target"
-
-# shellcheck source=/dev/null
-. "$(dirname "${BASH_SOURCE[0]}")/inc/commons.inc"
-
-# shellcheck source=/dev/null
-. "$(dirname "${BASH_SOURCE[0]}")/inc/keys.inc"
+[ ! -d "$(dirname "${BASH_SOURCE[0]}")/target" ] && mkdir "$(dirname "${BASH_SOURCE[0]}")/target"
 
 ERROR_build_dockerBuild=1
 ERROR_build_dockerRun=2
-#ERROR_build_dockerExec_linkPlugins=3
-ERROR_build_dockerExec_waitForGoServer=4
-ERROR_build_dockerCommit=5
+ERROR_build_dockerCommit=3
+ERROR_build_dockerExec_waitForGoServer=5
 ERROR_build_dockerRemove_container=6
 ERROR_destroy_dockerRemove_container=7
 ERROR_run_dockerExec_waitForGoServer=8
 ERROR_run_dockerRun=9
 ERROR_ship_dockerPush=10
+ERROR_noDockerHubUsername=11
+ERROR_noDockerHubPassword=12
 
 
 
@@ -45,8 +39,10 @@ function getImageTag() {
 function build() {
   local imageName=$1
 
+  [ -z "$DOCKER_HUB_USERNAME" ] && return $ERROR_noDockerHubUsername
+
   containerName=${imageName//:/-}
-  imageName="$(getDockerHubUsername)/$imageName"
+  imageName="$DOCKER_HUB_USERNAME/$imageName"
 
   docker build --no-cache -t "$imageName" "$(dirname "${BASH_SOURCE[0]}")"/docker | tee /tmp/server-build.out \
   || return $ERROR_build_dockerBuild
@@ -79,11 +75,14 @@ function build() {
 function ship() {
   local imageName=$1
 
-  docker login --username "$(getDockerHubUsername)" --password "$(getDockerHubPassword)"
+  [ -z "$DOCKER_HUB_USERNAME" ] && return $ERROR_noDockerHubUsername
+  [ -z "$DOCKER_HUB_PASSWORD" ] && return $ERROR_noDockerHubPassword
 
-  docker push "$(getDockerHubUsername)/$imageName" || return $ERROR_ship_dockerPush
+  docker login --username "$DOCKER_HUB_USERNAME" --password "$DOCKER_HUB_PASSWORD"
 
-  echo "$(getDockerHubUsername)/$imageName" > "$(dirname "${BASH_SOURCE[0]}")"/target/gocdServerImageName
+  docker push "$DOCKER_HUB_USERNAME/$imageName" || return $ERROR_ship_dockerPush
+
+  echo "$DOCKER_HUB_USERNAME/$imageName" > "$(dirname "${BASH_SOURCE[0]}")"/target/gocdServerImageName
 
   # docker rmi "$(docker images "$imageName" -q)"  || return $ERROR_ship_dockerRemoveImage
 
@@ -95,10 +94,12 @@ function ship() {
 function run() {
   local imageName=$1
 
+  [ -z "$DOCKER_HUB_USERNAME" ] && return $ERROR_noDockerHubUsername
+
   containerName=${imageName//:/-}
 
   containerId=$(docker run --name "$containerName" -d \
-    "$(getDockerHubUsername)/$imageName"
+    "$DOCKER_HUB_USERNAME/$imageName"
   ) || return $ERROR_run_dockerRun
 
   containerId=${containerId:0:12}
