@@ -18,6 +18,14 @@ ERROR_noDockerHubPassword=12
 
 
 
+function getRelease() {
+  gpc="${GO_PIPELINE_COUNTER:-0}"
+  rev=${GO_REVISION:-$(git rev-parse HEAD)}
+  echo "$gpc-${rev:0:7}"
+}
+
+
+
 function getImageTag() {
   local imageName=${1:-gocd-server}
 
@@ -43,6 +51,8 @@ function build() {
 
   containerName=${imageName//:/-}
   imageName="$DOCKER_HUB_USERNAME/$imageName"
+
+  echo "IMAGE_RELEASE=$(getRelease)" > docker/release
 
   docker build --no-cache -t "$imageName" "$(dirname "${BASH_SOURCE[0]}")"/docker | tee /tmp/server-build.out \
   || return $ERROR_build_dockerBuild

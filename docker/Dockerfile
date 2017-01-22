@@ -11,6 +11,7 @@ COPY wait_for_go_server.sh /usr/bin
 COPY known_hosts /etc/ssh/github_known_hosts
 COPY ssh_config  /etc/ssh
 COPY bh_init     /gocd/bh_init
+COPY release     /gocd/release
 
 # plugins
 
