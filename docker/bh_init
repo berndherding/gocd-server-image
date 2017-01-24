@@ -23,4 +23,6 @@ echo "vmdocker:x:497:go" >> /etc/group
 # force generation of new keystores
 rm /etc/go/*store* 2> /dev/null
 
+echo "$ADMIN_PASSWORT" > /gocd/gocdServerOTP
+
 /sbin/my_init
