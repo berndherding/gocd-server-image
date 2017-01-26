@@ -72,10 +72,9 @@ function build() {
 
   docker rm -f "$containerName" || return $ERROR_build_dockerRemove_container
 
-# TODO CLEANUP:
-# docker ps -a  | grep Exited | awk '{print $1}' | xargs docker rm -f
-# docker images | grep none   | awk '{print $3}' | xargs docker rmi
-# docker volume ls -qf dangling=true | xargs -r docker volume rm
+  docker ps -a  | grep Exited | awk '{print $1}' | xargs docker rm -f
+  docker images | grep none   | awk '{print $3}' | xargs docker rmi
+  docker volume ls -qf dangling=true | xargs -r docker volume rm
 
   return 0
 }
