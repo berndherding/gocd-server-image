@@ -23,6 +23,21 @@ echo "vmdocker:x:497:go" >> /etc/group
 # force generation of new keystores
 rm /etc/go/*store* 2> /dev/null
 
-echo "$ADMIN_PASSWORT" > /gocd/gocdServerOTP
+if [ -n "$ADMIN_PASSWWORD" ] ; then
+
+  HTPASSWD="$(echo -n "$ADMIN_PASSWORD" | htpasswd -i -n -s admin)"
+
+  if [ -f "/etc/go/htpasswd" ] ; then 
+    touch "/etc/go/htpasswd"
+    chown go.go /etc/go/htpasswd
+    chmod 600   /etc/go/htpasswd
+  fi
+
+  if grep "^$HTPASSWD:" /etc/go/htpasswd &> /dev/null ; then
+    sed -i -e 's/^admin:.*/'"$HTPASSWD"'/' /etc/go/htpasswd
+  else
+    echo "$HTPASSWD" >> /etc/go/htpasswd
+  fi
+fi 
 
 /sbin/my_init
