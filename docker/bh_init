@@ -23,11 +23,11 @@ echo "vmdocker:x:497:go" >> /etc/group
 # force generation of new keystores
 rm /etc/go/*store* 2> /dev/null
 
-if [ -n "$ADMIN_PASSWWORD" ] ; then
+if [ -n "$ADMIN_PASSWORD" ] ; then
 
   HTPASSWD="$(echo -n "$ADMIN_PASSWORD" | htpasswd -i -n -s admin)"
 
-  if [ -f "/etc/go/htpasswd" ] ; then 
+  if [ ! -f "/etc/go/htpasswd" ] ; then 
     touch "/etc/go/htpasswd"
     chown go.go /etc/go/htpasswd
     chmod 600   /etc/go/htpasswd
