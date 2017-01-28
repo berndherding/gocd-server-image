@@ -33,7 +33,7 @@ if [ -n "$ADMIN_PASSWORD" ] ; then
     chmod 600   /etc/go/htpasswd
   fi
 
-  if grep "^$HTPASSWD:" /etc/go/htpasswd &> /dev/null ; then
+  if grep "$HTPASSWD" /etc/go/htpasswd &> /dev/null ; then
     sed -i -e 's/^admin:.*/'"$HTPASSWD"'/' /etc/go/htpasswd
   else
     echo "$HTPASSWD" >> /etc/go/htpasswd
