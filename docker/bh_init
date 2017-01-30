@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/bin/bash -x
+
+exec > >(tee /var/log/bh_init.log | logger -t bh_init -s 2>/dev/console) 2>&1
 
 if [ -n "$GITHUB_PRIVATE_KEY" ] && [ "$ENABLE_GITHUB_PRIVATE_REPO_SUPPORT" = "yes" ] ; then
 
