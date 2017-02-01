@@ -73,12 +73,15 @@ function build() {
   docker rm -f "$containerName" || return $ERROR_build_dockerRemove_container
 
   dead="$(docker ps --filter status=dead --filter status=exited -aq)"
+  # shellcheck disable=SC2086
   [ -n "$dead" ]     && docker rm -v $dead
 
   untagged="$(docker images --no-trunc | grep '<none>' | awk '{ print $3 }')"
+  # shellcheck disable=SC2086
   [ -n "$untagged" ] && docker rmi $untagged
 
   dangling="(docker volume ls -qf dangling=true)" 
+  # shellcheck disable=SC2086
   [ -n "$dangling" ] && docker volume rm $dangling
 
   return 0
