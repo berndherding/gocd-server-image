@@ -72,9 +72,14 @@ function build() {
 
   docker rm -f "$containerName" || return $ERROR_build_dockerRemove_container
 
-#  docker ps -a  | grep Exited | awk '{print $1}' | xargs docker rm -f
-#  docker images | grep none   | awk '{print $3}' | xargs docker rmi
-#  docker volume ls -qf dangling=true | xargs -r docker volume rm
+  dead="$(docker ps --filter status=dead --filter status=exited -aq)"
+  [ -n "$dead" ]     && docker rm -v $dead
+
+  untagged="$(docker images --no-trunc | grep '<none>' | awk '{ print $3 }')"
+  [ -n "$untagged" ] && docker rmi $untagged
+
+  dangling="(docker volume ls -qf dangling=true)" 
+  [ -n "$dangling" ] && docker volume rm $dangling
 
   return 0
 }
