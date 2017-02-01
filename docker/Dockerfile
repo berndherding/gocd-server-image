@@ -18,7 +18,7 @@ COPY install_packages.sh .
 ADD  https://github.com/DennisDenuto/go-aws-ami-poller/releases/download/15.2.0/aws-ami-poller-15.2.0.jar /plugins
 ADD  https://github.com/ind9/gocd-s3-artifacts/releases/download/v2.0.2/s3material-assembly-2.0.2.jar     /plugins
 ADD  https://github.com/gocd-contrib/deb-repo-poller/releases/download/1.2/deb-repo-poller-1.2.jar        /plugins
-# ADD  https://github.com/gocd-contrib/docker-swarm-elastic-agents/releases/download/v1.1.2/docker-swarm-elastic-agents-1.1.2.jar /plugins
+ADD  https://github.com/gocd-contrib/docker-swarm-elastic-agents/releases/download/v1.1.2/docker-swarm-elastic-agents-1.1.2.jar /plugins
 
 RUN  /bin/bash install_packages.sh
 
